@@ -8,5 +8,5 @@ fn main() {
     let mut input:String = String::new();
     io::stdout().flush().unwrap();
     io::stdin().read_to_string(&mut input);
-    println!("\n{input}: command not found");
+    println!("{input}: command not found");
 }
