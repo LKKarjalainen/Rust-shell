@@ -16,10 +16,10 @@ fn main() {
         if command.trim() == "echo" {
             let mut output: String = String::new();
             for arg in args {
-                output.push_str(arg);
+                output.push_str(arg.trim());
                 output.push(' ');
             }
-            print!("{}", output);
+            println!("{}", output);
             continue;
         }
         if command.trim() == "exit" {
