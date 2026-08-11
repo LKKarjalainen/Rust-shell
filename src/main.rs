@@ -1,7 +1,27 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
+use std::env;
+use std::os::unix::fs::MetadataExt;
+use std::path::Path;
+use std::fs::{self, Metadata};
+
 
 const BUILT_IN: &[&str] = &["echo", "type", "exit"];
+
+fn search_path(command: &str) -> Option<String> {
+    let path: String = env::var("PATH").ok()?;
+    let path_dirs:Vec<&str> = path.split(':').collect();
+    for path_dir in path_dirs {
+        let command_path: String = format!("{}/{}", path_dir, command);
+        if Path::new(&command_path).exists() {
+            let metadata: Metadata = fs::metadata(&command_path).unwrap();
+            if metadata.mode() & 0o111 != 0 {
+                return Some(command_path);
+            }
+        }
+    }
+    None
+}   
 
 fn main() {
     loop {
@@ -19,6 +39,10 @@ fn main() {
             output.push_str(args[0].trim());
             if BUILT_IN.contains(&args[0].trim()) {
                 output.push_str(" is a shell builtin");
+            }
+            else if let Some(path) = search_path(&args[0].trim()) {
+                output.push_str(" is ");
+                output.push_str(&path);
             }
             else {
                 output.push_str(": not found");
