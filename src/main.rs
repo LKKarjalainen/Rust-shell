@@ -50,12 +50,17 @@ fn main() {
                 println!("You must provide a path!");
                 continue;
             }
-            let res = Path::new(&args[0].trim()).exists();
-            if !res {
-                println!("cd: {}: No such file or directory", &args[0].trim());
+            if args[0].trim() == "~" {
+                env::set_current_dir(env::home_dir().unwrap()).unwrap();
                 continue;
             }
-            env::set_current_dir(&args[0].trim()).unwrap();
+            let path: &Path = Path::new(args[0].trim());
+            let exists = path.exists();
+            if !exists {
+                println!("cd: {:?}: No such file or directory", path);
+                continue;
+            }
+            env::set_current_dir(path).unwrap();
             continue;
         }
 
