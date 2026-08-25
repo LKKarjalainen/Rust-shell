@@ -57,7 +57,7 @@ fn main() {
             let path: &Path = Path::new(args[0].trim());
             let exists = path.exists();
             if !exists {
-                println!("cd: {:?}: No such file or directory", path);
+                println!("cd: {}: No such file or directory", path.to_string_lossy());
                 continue;
             }
             env::set_current_dir(path).unwrap();
