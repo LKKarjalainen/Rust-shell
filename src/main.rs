@@ -30,12 +30,12 @@ fn main() {
         let mut input:String = String::new();
         io::stdout().flush().unwrap();
         io::stdin().read_line(&mut input).unwrap();
-        let mut input_vec:Vec<&str> = input.split(' ').collect();
+        let mut input_vec:Vec<&str> = input.trim().split(' ').collect();
         let args: Vec<&str> = input_vec.split_off(1);
-        let command: &str = input_vec[0];
+        let command: &str = input_vec[0].trim();
         //println!("command: {:?}", input_vec);
         //println!("args: {:?}", args);
-        if command.trim() == "type" {
+        if command == "type" {
             let mut output: String = String::new();
             output.push_str(args[0].trim());
             if BUILT_IN.contains(&args[0].trim()) {
@@ -51,7 +51,7 @@ fn main() {
             println!("{}", output);
             continue;
         }
-        if command.trim() == "echo" {
+        if command == "echo" {
             let mut output: String = String::new();
             for arg in args {
                 output.push_str(arg.trim());
@@ -60,12 +60,21 @@ fn main() {
             println!("{}", output);
             continue;
         }
-        if command.trim() == "exit" {
+        if command == "exit" {
             break;
         }
-        if let Some(path) = search_path(&args[0].trim()) {
-            Command::new("sh").args(args);
+        if let Some(path) = search_path(&command) {
+            //println!("executable in {}", path);
+            let exec_output = Command::new(&path).args(args).output().unwrap();
+            //println!("{:?}", exec_output);
+            if exec_output.stdout.is_empty() {
+                println!("{}", String::from_utf8_lossy(&exec_output.stderr));
+            }
+            else {
+                println!("{}", String::from_utf8_lossy(&exec_output.stdout))
+            }
+            continue;
         }
-        println!("{}: command not found", command.trim());
+        println!("{}: command not found", command);
     }
 }
