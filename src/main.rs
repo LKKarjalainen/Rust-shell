@@ -7,7 +7,7 @@ use std::fs::{self, Metadata};
 use std::process::Command;
 
 
-const BUILT_IN: &[&str] = &["echo", "type", "exit"];
+const BUILT_IN: &[&str] = &["echo", "type", "exit", "pwd"];
 
 fn search_path(command: &str) -> Option<String> {
     let path: String = env::var("PATH").ok()?;
@@ -35,6 +35,11 @@ fn main() {
         let command: &str = input_vec[0].trim();
         //println!("command: {:?}", input_vec);
         //println!("args: {:?}", args);
+        if command == "pwd" {
+            let path =  env::current_dir().unwrap();
+            println!("{}", path.as_path().to_string_lossy());
+            continue;
+        }
         if command == "type" {
             let mut output: String = String::new();
             output.push_str(args[0].trim());
@@ -51,6 +56,7 @@ fn main() {
             println!("{}", output);
             continue;
         }
+
         if command == "echo" {
             let mut output: String = String::new();
             for arg in args {
@@ -60,9 +66,11 @@ fn main() {
             println!("{}", output);
             continue;
         }
+
         if command == "exit" {
             break;
         }
+
         if let Some(path) = search_path(&command) {
             //println!("executable in {}", path);
             let exec_output = Command::new(&command).args(args).output().unwrap();
@@ -75,6 +83,7 @@ fn main() {
             }
             continue;
         }
+        
         println!("{}: command not found", command);
     }
 }
