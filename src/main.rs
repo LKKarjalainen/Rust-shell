@@ -7,7 +7,7 @@ use std::fs::{self, Metadata};
 use std::process::Command;
 
 
-const BUILT_IN: &[&str] = &["echo", "type", "exit", "pwd"];
+const BUILT_IN: &[&str] = &["echo", "type", "exit", "pwd", "cd"];
 
 fn search_path(command: &str) -> Option<String> {
     let path: String = env::var("PATH").ok()?;
@@ -33,13 +33,32 @@ fn main() {
         let mut input_vec:Vec<&str> = input.trim().split(' ').collect();
         let args: Vec<&str> = input_vec.split_off(1);
         let command: &str = input_vec[0].trim();
+        if command == "" {
+            continue;
+        }
         //println!("command: {:?}", input_vec);
         //println!("args: {:?}", args);
+        
         if command == "pwd" {
             let path =  env::current_dir().unwrap();
             println!("{}", path.as_path().to_string_lossy());
             continue;
         }
+
+        if command == "cd" {
+            if args.len() <= 0 {
+                println!("You must provide a path!");
+                continue;
+            }
+            let res = Path::new(&args[0].trim()).exists();
+            if !res {
+                println!("cd: {}: No such file or directory", &args[0].trim());
+                continue;
+            }
+            env::set_current_dir(&args[0].trim()).unwrap();
+            continue;
+        }
+
         if command == "type" {
             let mut output: String = String::new();
             output.push_str(args[0].trim());
@@ -70,7 +89,7 @@ fn main() {
         if command == "exit" {
             break;
         }
-
+        println!("{:?}", search_path(&command));
         if let Some(path) = search_path(&command) {
             //println!("executable in {}", path);
             let exec_output = Command::new(&command).args(args).output().unwrap();
