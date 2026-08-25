@@ -89,7 +89,6 @@ fn main() {
         if command == "exit" {
             break;
         }
-        println!("{:?}", search_path(&command));
         if let Some(path) = search_path(&command) {
             //println!("executable in {}", path);
             let exec_output = Command::new(&command).args(args).output().unwrap();
