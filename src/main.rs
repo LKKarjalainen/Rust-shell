@@ -65,7 +65,7 @@ fn main() {
         }
         if let Some(path) = search_path(&command) {
             //println!("executable in {}", path);
-            let exec_output = Command::new(&path).args(args).output().unwrap();
+            let exec_output = Command::new(&command).args(args).output().unwrap();
             //println!("{:?}", exec_output);
             if exec_output.stdout.is_empty() {
                 println!("{}", String::from_utf8_lossy(&exec_output.stderr));
