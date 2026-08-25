@@ -4,6 +4,7 @@ use std::env;
 use std::os::unix::fs::MetadataExt;
 use std::path::Path;
 use std::fs::{self, Metadata};
+use std::process::Command;
 
 
 const BUILT_IN: &[&str] = &["echo", "type", "exit"];
@@ -61,6 +62,9 @@ fn main() {
         }
         if command.trim() == "exit" {
             break;
+        }
+        if let Some(path) = search_path(&args[0].trim()) {
+            Command::new("sh").args(args);
         }
         println!("{}: command not found", command.trim());
     }
