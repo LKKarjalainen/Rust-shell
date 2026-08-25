@@ -33,8 +33,8 @@ fn main() {
         let mut input_vec:Vec<&str> = input.trim().split(' ').collect();
         let args: Vec<&str> = input_vec.split_off(1);
         let command: &str = input_vec[0].trim();
-        //println!("command: {:?}", input_vec);
-        //println!("args: {:?}", args);
+        println!("command: {:?}", input_vec);
+        println!("args: {:?}", args);
         if command == "type" {
             let mut output: String = String::new();
             output.push_str(args[0].trim());
@@ -68,10 +68,10 @@ fn main() {
             let exec_output = Command::new(&command).args(args).output().unwrap();
             //println!("{:?}", exec_output);
             if exec_output.stdout.is_empty() {
-                println!("{}", String::from_utf8_lossy(&exec_output.stderr));
+                print!("{}", String::from_utf8_lossy(&exec_output.stderr));
             }
             else {
-                println!("{}", String::from_utf8_lossy(&exec_output.stdout))
+                print!("{}", String::from_utf8_lossy(&exec_output.stdout))
             }
             continue;
         }
