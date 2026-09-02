@@ -1,35 +1,60 @@
-[![progress-banner](https://backend.codecrafters.io/progress/shell/00666cb4-7382-4af9-8e02-cd328f9e5296)](https://app.codecrafters.io/users/LKKarjalainen?r=2qF)
+# rust-shell
 
-This is a starting point for Rust solutions to the
+A small POSIX-style shell written in Rust, originally built as a solution to the
 ["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
 
-In this challenge, you'll build your own POSIX compliant shell that's capable of
-interpreting shell commands, running external programs and builtin commands like
-cd, pwd, echo and more. Along the way, you'll learn about shell command parsing,
-REPLs, builtin commands, and more.
+It reads commands from stdin at a `$ ` prompt, handles a few builtins itself
+(`echo`, `type`, `pwd`, `cd`, `exit`), and looks up anything else on `PATH` and
+executes it.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+## Requirements
 
-# Passing the first stage
+- Rust 1.96 or newer.
+- A Unix-like OS.
 
-The entry point for your `shell` implementation is in `src/main.rs`. Study and
-uncomment the relevant code, then run the command below to execute the tests on
-our servers:
+## Running in dev mode
+
+From the repository root:
 
 ```sh
-codecrafters submit
+cargo run
+```
+This builds an unoptimized binary with debug assertions and drops you straight
+into the shell:
+
+Go ahead and try these
+```
+$ echo hello
+hello
+$ type pwd
+pwd is a shell builtin
+$ exit
 ```
 
-Time to move on to the next stage!
+## Building for release
 
-# Stage 2 & beyond
+```sh
+cargo build --release
+```
 
-Note: This section is for stages 2 and beyond.
+The optimized binary is written to `target/release/rust-shell`.
 
-1. Ensure you have `cargo (1.96)` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
-   `src/main.rs`. This command compiles your Rust project, so it might be slow
-   the first time you run it. Subsequent runs will be fast.
-1. Run `codecrafters submit` to submit your solution to CodeCrafters. Test
-   output will be streamed to your terminal.
+## Running the release build
+
+```sh
+./target/release/rust-shell
+```
+
+To run it from anywhere, copy the binary onto your `PATH`:
+
+```sh
+cp target/release/rust-shell ~/.local/bin/
+rust-shell
+```
+
+Or install it through Cargo, which builds in release mode and places the binary
+in `~/.cargo/bin`:
+
+```sh
+cargo install --path .
+```
