@@ -79,7 +79,13 @@ impl Builtin {
                 env::set_current_dir(path).unwrap();
                 return Loop::Continue;
             },
-            Self::Exit => { return Loop::Exit(67); }
+            Self::Exit => {
+                if let Some(code) = args.first() {
+                    let code: i32 = code.parse().unwrap_or(67);
+                    return Loop::Exit(code);
+                }
+                return Loop::Exit(67);
+            }
         }
     }
 }
@@ -122,7 +128,7 @@ fn main() {
                 continue;
             }
             None => {
-                if let Some(path) = search_path(command) {
+                if search_path(command).is_some() {
                 //println!("executable in {}", path);
                 let exec_output = Command::new(&command).args(args).output().unwrap();
                 //println!("{:?}", exec_output);
