@@ -1,0 +1,644 @@
+<title>Shell Stage Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+  :root {
+    --ground:    #F3F5F1;
+    --surface:   #FBFCFA;
+    --sunk:      #E8ECE5;
+    --ink:       #1A1F19;
+    --ink-soft:  #4C554A;
+    --ink-mute:  #767F73;
+    --rule:      #D5DBD0;
+    --rule-soft: #E4E8E0;
+    --accent:    #3B6B4B;
+    --accent-bg: #E2EBE2;
+    --mark:      #9A6A1E;
+    --mark-bg:   #F5EAD6;
+
+    --serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    --sans:  "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:    #12160F;
+      --surface:   #1A1F17;
+      --sunk:      #232920;
+      --ink:       #E5EAE1;
+      --ink-soft:  #B0B8AC;
+      --ink-mute:  #848D80;
+      --rule:      #2E352A;
+      --rule-soft: #262C22;
+      --accent:    #83B492;
+      --accent-bg: #1E2A20;
+      --mark:      #D6A65C;
+      --mark-bg:   #2A2317;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:    #12160F;
+    --surface:   #1A1F17;
+    --sunk:      #232920;
+    --ink:       #E5EAE1;
+    --ink-soft:  #B0B8AC;
+    --ink-mute:  #848D80;
+    --rule:      #2E352A;
+    --rule-soft: #262C22;
+    --accent:    #83B492;
+    --accent-bg: #1E2A20;
+    --mark:      #D6A65C;
+    --mark-bg:   #2A2317;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 1.25rem 6rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 54rem; margin: 0 auto; }
+
+  /* ---- masthead ---- */
+  header.masthead { padding: 3.5rem 0 2rem; border-bottom: 2px solid var(--ink); }
+  .eyebrow {
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 600; font-size: clamp(2.1rem, 5.5vw, 3.1rem);
+    line-height: 1.08; letter-spacing: -.02em; margin: 0 0 .85rem; text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 1.06rem; color: var(--ink-soft); max-width: 40rem; margin: 0;
+  }
+
+  /* ---- progress bar ---- */
+  .progress { display: flex; align-items: baseline; gap: .75rem; margin: 1.75rem 0 0; flex-wrap: wrap; }
+  .progress .count {
+    font-family: var(--mono); font-size: 1.5rem; font-weight: 500;
+    color: var(--ink); font-variant-numeric: tabular-nums;
+  }
+  .progress .label { font-size: .85rem; color: var(--ink-mute); }
+  .meter { flex: 1 1 12rem; height: 6px; background: var(--sunk); border-radius: 3px; overflow: hidden; min-width: 8rem; }
+  .meter i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s ease; }
+  @media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+
+  /* ---- generic sections ---- */
+  section { margin: 3.25rem 0 0; }
+  h2 {
+    font-family: var(--serif); font-weight: 600; font-size: 1.5rem;
+    letter-spacing: -.01em; margin: 0 0 .5rem; text-wrap: balance;
+  }
+  p { margin: 0 0 1rem; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  /* ---- callout panels ---- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 4px; padding: 1.4rem 1.5rem; display: flex;
+    flex-direction: column; gap: .85rem;
+  }
+  .panel h2 { font-size: 1.15rem; margin: 0; }
+  .panel p:last-child { margin-bottom: 0; }
+  .panel.note { border-left: 3px solid var(--mark); }
+
+  dl.state { display: grid; grid-template-columns: auto 1fr; gap: .35rem 1.1rem; margin: 0; font-size: .93rem; }
+  dl.state dt { font-family: var(--mono); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-mute); padding-top: .18rem; }
+  dl.state dd { margin: 0; }
+
+  /* ---- table of contents ---- */
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; background: var(--rule-soft); border: 1px solid var(--rule-soft); border-radius: 4px; overflow: hidden; }
+  nav.toc li { background: var(--surface); }
+  nav.toc a { display: flex; align-items: baseline; gap: .8rem; padding: .6rem .9rem; text-decoration: none; color: var(--ink); }
+  nav.toc a:hover { background: var(--accent-bg); }
+  nav.toc .r { font-family: var(--mono); font-size: .78rem; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  nav.toc .t { flex: 1; }
+  nav.toc .n { font-family: var(--mono); font-size: .78rem; color: var(--accent); }
+
+  /* ---- stage groups ---- */
+  .group { margin: 3.5rem 0 0; scroll-margin-top: 1rem; }
+  .group-head { border-bottom: 1px solid var(--rule); padding-bottom: .7rem; margin-bottom: .25rem; }
+  .group-head .range {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-mute); display: block; margin-bottom: .3rem;
+  }
+  .arch {
+    font-size: .95rem; color: var(--ink-soft); background: var(--sunk);
+    border-radius: 4px; padding: .9rem 1.1rem; margin: 1rem 0 1.25rem;
+  }
+  .arch strong { color: var(--ink); font-weight: 600; }
+
+  ol.stages { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  li.stage {
+    display: grid; grid-template-columns: 1.6rem 2rem 1fr; gap: 0 .8rem;
+    padding: 1.05rem 0; border-bottom: 1px solid var(--rule-soft); align-items: start;
+  }
+  li.stage:last-child { border-bottom: none; }
+  li.stage .num {
+    font-family: var(--mono); font-size: .82rem; color: var(--ink-mute);
+    font-variant-numeric: tabular-nums; padding-top: .18rem; text-align: right;
+  }
+  li.stage input[type=checkbox] { width: 1.05rem; height: 1.05rem; margin: .25rem 0 0; accent-color: var(--accent); cursor: pointer; }
+  li.stage h3 { font-size: 1rem; font-weight: 600; margin: 0 0 .3rem; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  li.stage p { font-size: .93rem; color: var(--ink-soft); margin: 0; }
+  li.stage.done h3 { color: var(--ink-mute); text-decoration: line-through; text-decoration-color: var(--rule); }
+
+  .slug { font-family: var(--mono); font-size: .72rem; color: var(--ink-mute); background: var(--sunk); padding: .1rem .38rem; border-radius: 3px; font-weight: 400; }
+  .diff { font-family: var(--mono); font-size: .66rem; letter-spacing: .07em; text-transform: uppercase; padding: .12rem .4rem; border-radius: 3px; font-weight: 500; }
+  .d-easy { color: var(--accent); background: var(--accent-bg); }
+  .d-med  { color: var(--ink-soft); background: var(--sunk); }
+  .d-hard { color: var(--mark); background: var(--mark-bg); }
+
+  pre.io {
+    font-family: var(--mono); font-size: .8rem; line-height: 1.55;
+    background: var(--sunk); color: var(--ink); border-radius: 4px;
+    padding: .7rem .85rem; margin: .55rem 0 0; overflow-x: auto;
+  }
+  pre.io .c { color: var(--ink-mute); }
+  code { font-family: var(--mono); font-size: .87em; background: var(--sunk); padding: .08rem .3rem; border-radius: 3px; }
+  pre.io code { background: none; padding: 0; font-size: inherit; }
+
+  /* ---- you-are-here rule ---- */
+  .youarehere {
+    display: flex; align-items: center; gap: .9rem; margin: 1.5rem 0;
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--mark);
+  }
+  .youarehere::before, .youarehere::after { content: ""; height: 1px; background: var(--mark); opacity: .45; flex: 1; }
+
+  footer { margin: 4.5rem 0 0; padding-top: 1.75rem; border-top: 1px solid var(--rule); font-size: .88rem; color: var(--ink-mute); }
+  footer p { margin: 0 0 .7rem; }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 0; }
+    .meter, nav.toc { display: none; }
+    li.stage { break-inside: avoid; }
+  }
+</style>
+
+<div class="wrap">
+<header class="masthead">
+  <p class="eyebrow">CodeCrafters · Build Your Own Shell · Rust</p>
+  <h1>Shell Stage Field Guide</h1>
+  <p class="standfirst">All 76 stages of the challenge in order, with what each one asks for and the Rust decision waiting inside it. Written to be read with the network off.</p>
+  <div class="progress">
+    <span class="count"><span id="done">0</span> / 76</span>
+    <span class="label">stages marked complete</span>
+    <span class="meter"><i id="bar"></i></span>
+  </div>
+</header>
+
+<section>
+  <div class="panel note">
+    <h2>Where your shell is right now</h2>
+    <dl class="state">
+      <dt>Passing</dt>
+      <dd>Stages 1–12 — REPL, <code>exit</code>, <code>echo</code>, <code>type</code>, PATH lookup, external programs, <code>pwd</code>, and all three <code>cd</code> forms.</dd>
+      <dt>Shape</dt>
+      <dd>Single <code>src/main.rs</code>. Builtins live on an <code>enum Builtin</code> with a <code>from_name</code> lookup and an exhaustive <code>run</code> match returning <code>Loop::Continue</code> / <code>Loop::Exit(i32)</code>.</dd>
+      <dt>Open</dt>
+      <dd>The <code>Self::Exit</code> arm returns a hardcoded <code>67</code> instead of parsing <code>args</code>. Module split (<code>builtin.rs</code>, <code>path.rs</code>) not done yet.</dd>
+      <dt>Next</dt>
+      <dd>Stage 13. This is the wall: <code>input.split(' ')</code> cannot survive quoting. Build a lexer before writing any more builtins.</dd>
+    </dl>
+  </div>
+</section>
+
+<section>
+  <h2>How to read this</h2>
+  <p>Stage names, slugs, and difficulty ratings come from the public course overview. The stage <em>instructions</em> sit behind a login, so every description and example below is my own reconstruction of the behavior from POSIX and bash semantics — accurate to how a shell works, but not word-for-word what the test harness prints. When a stage fails, trust the harness output over this page.</p>
+  <p>Checkboxes save to this browser only. Stages 1–12 start ticked.</p>
+</section>
+
+<section>
+  <h2>Contents</h2>
+  <nav class="toc">
+    <ol>
+      <li><a href="#g1"><span class="r">01–08</span><span class="t">Core</span><span class="n">8</span></a></li>
+      <li><a href="#g2"><span class="r">09–12</span><span class="t">Navigation</span><span class="n">4</span></a></li>
+      <li><a href="#g3"><span class="r">13–18</span><span class="t">Quoting</span><span class="n">6</span></a></li>
+      <li><a href="#g4"><span class="r">19–22</span><span class="t">Redirection</span><span class="n">4</span></a></li>
+      <li><a href="#g5"><span class="r">23–28</span><span class="t">Command completion</span><span class="n">6</span></a></li>
+      <li><a href="#g6"><span class="r">29–35</span><span class="t">Filename completion</span><span class="n">7</span></a></li>
+      <li><a href="#g7"><span class="r">36–45</span><span class="t">Programmable completion</span><span class="n">10</span></a></li>
+      <li><a href="#g8"><span class="r">46–54</span><span class="t">Background jobs</span><span class="n">9</span></a></li>
+      <li><a href="#g9"><span class="r">55–57</span><span class="t">Pipelines</span><span class="n">3</span></a></li>
+      <li><a href="#g10"><span class="r">58–63</span><span class="t">History</span><span class="n">6</span></a></li>
+      <li><a href="#g11"><span class="r">64–69</span><span class="t">History persistence</span><span class="n">6</span></a></li>
+      <li><a href="#g12"><span class="r">70–76</span><span class="t">Parameter expansion</span><span class="n">7</span></a></li>
+    </ol>
+  </nav>
+</section>
+
+<section class="group" id="g1">
+  <div class="group-head"><span class="range">Stages 01–08</span><h2>Core</h2></div>
+  <p class="arch">Gets you a working REPL and the four builtins everything else is measured against. <strong>The decision here:</strong> where command dispatch lives. An <code>enum Builtin</code> plus an exhaustive <code>match</code> means adding a builtin later is a compile error until you handle it, instead of a silent no-op.</p>
+  <ol class="stages">
+    <li class="stage" data-n="1"><input type="checkbox"><span class="num">01</span><div>
+      <h3>Print a prompt <code class="slug">introduction</code><span class="diff d-easy">Very easy</span></h3>
+      <p>Print <code>$ </code> with no trailing newline, then flush. Without the flush the prompt sits in the buffer and the harness sees nothing.</p>
+      <pre class="io"><code>print!("$ ");
+io::stdout().flush().unwrap();</code></pre></div></li>
+    <li class="stage" data-n="2"><input type="checkbox"><span class="num">02</span><div>
+      <h3>Handle invalid commands <code class="slug">cz2</code><span class="diff d-easy">Easy</span></h3>
+      <p>Read one line and report an unknown command. Real bash writes this to stderr; the harness reads both, so either works for now.</p>
+      <pre class="io"><code>$ nonexistent
+nonexistent: command not found</code></pre></div></li>
+    <li class="stage" data-n="3"><input type="checkbox"><span class="num">03</span><div>
+      <h3>Implement a REPL <code class="slug">ff0</code><span class="diff d-easy">Easy</span></h3>
+      <p>Wrap the prompt and read in a <code>loop</code>. Watch for EOF: <code>read_line</code> returning <code>Ok(0)</code> means stdin closed and you must break, or you spin forever burning CPU.</p></div></li>
+    <li class="stage" data-n="4"><input type="checkbox"><span class="num">04</span><div>
+      <h3>Implement exit <code class="slug">pn5</code><span class="diff d-easy">Easy</span></h3>
+      <p><code>exit 0</code> terminates with that status. A method cannot <code>break</code> its caller's loop, so this is what forces a return type — an enum with a payload variant carries the code out.</p>
+      <pre class="io"><code>Loop::Exit(args.first().and_then(|a| a.parse().ok()).unwrap_or(0))</code></pre></div></li>
+    <li class="stage" data-n="5"><input type="checkbox"><span class="num">05</span><div>
+      <h3>Implement echo <code class="slug">iz3</code><span class="diff d-easy">Easy</span></h3>
+      <p>Print the arguments separated by a single space. <code>args.join(" ")</code> puts separators <em>between</em> elements, which avoids the trailing space a push-loop leaves behind.</p></div></li>
+    <li class="stage" data-n="6"><input type="checkbox"><span class="num">06</span><div>
+      <h3>Implement type <code class="slug">ez5</code><span class="diff d-easy">Easy</span></h3>
+      <p>Report whether a name is a builtin. Ask the enum — <code>Builtin::from_name(x).is_some()</code> — rather than keeping a parallel list of names that can drift out of sync.</p>
+      <pre class="io"><code>$ type echo
+echo is a shell builtin
+$ type nope
+nope: not found</code></pre></div></li>
+    <li class="stage" data-n="7"><input type="checkbox"><span class="num">07</span><div>
+      <h3>Locate executable files <code class="slug">mg5</code><span class="diff d-med">Medium</span></h3>
+      <p>Split <code>$PATH</code> on <code>:</code>, join each entry with the command name, and take the first hit that exists and has an executable bit set. That needs <code>std::os::unix::fs::MetadataExt</code> and a <code>mode() &amp; 0o111 != 0</code> test.</p>
+      <pre class="io"><code>$ type ls
+ls is /usr/bin/ls</code></pre></div></li>
+    <li class="stage" data-n="8"><input type="checkbox"><span class="num">08</span><div>
+      <h3>Run a program <code class="slug">ip1</code><span class="diff d-med">Medium</span></h3>
+      <p>Execute the resolved program with its arguments. <strong>Prefer <code>spawn()</code> + <code>wait()</code> over <code>output()</code>:</strong> <code>output()</code> buffers both streams to completion, which breaks interactive programs and makes it easy to drop stderr. <code>spawn()</code> inherits your stdio so the child writes straight to the terminal, and you keep the <code>ExitStatus</code> for <code>$?</code> later.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g2">
+  <div class="group-head"><span class="range">Stages 09–12</span><h2>Navigation</h2></div>
+  <p class="arch">Four small stages that quietly introduce shell <em>state</em>. <strong>The decision here:</strong> process globals or a <code>Shell</code> struct. <code>env::set_current_dir</code> mutates the whole process, which you cannot unit-test and cannot snapshot for a subshell. Holding <code>cwd</code> in a struct threaded by <code>&amp;mut</code> costs nothing now and saves a rewrite at stage 55.</p>
+  <ol class="stages">
+    <li class="stage" data-n="9"><input type="checkbox"><span class="num">09</span><div>
+      <h3>The pwd builtin <code class="slug">ei0</code><span class="diff d-easy">Easy</span></h3>
+      <p>Print the absolute working directory. <code>env::current_dir()</code> returns a <code>PathBuf</code>; <code>.display()</code> is the idiomatic way to print it.</p></div></li>
+    <li class="stage" data-n="10"><input type="checkbox"><span class="num">10</span><div>
+      <h3>The cd builtin: absolute paths <code class="slug">ra6</code><span class="diff d-med">Medium</span></h3>
+      <p>Change directory, and print the exact error text when the target is missing.</p>
+      <pre class="io"><code>$ cd /nope
+cd: /nope: No such file or directory</code></pre></div></li>
+    <li class="stage" data-n="11"><input type="checkbox"><span class="num">11</span><div>
+      <h3>The cd builtin: relative paths <code class="slug">gq9</code><span class="diff d-med">Medium</span></h3>
+      <p><code>./dir</code>, <code>../</code>, and <code>.</code> must all work. <code>set_current_dir</code> resolves these against the process cwd already, so this is often free once stage 10 passes.</p></div></li>
+    <li class="stage" data-n="12"><input type="checkbox"><span class="num">12</span><div>
+      <h3>The cd builtin: home directory <code class="slug">gp4</code><span class="diff d-med">Medium</span></h3>
+      <p>Bare <code>cd</code> and <code>cd ~</code> both go to <code>$HOME</code>. Read the variable with <code>env::var("HOME")</code> — the harness sets it, and depending on it explicitly is more predictable than a helper. Note this is only <code>~</code> alone; <code>~/dir</code> and <code>~user</code> are not part of this stage.</p></div></li>
+  </ol>
+</section>
+
+<div class="youarehere">you are here</div>
+
+<section class="group" id="g3">
+  <div class="group-head"><span class="range">Stages 13–18</span><h2>Quoting</h2></div>
+  <p class="arch"><strong>The wall.</strong> Splitting on a space cannot express any of these six stages, because quoting is a state machine, not a delimiter rule. Write <code>fn lex(&amp;str) -&gt; Vec&lt;String&gt;</code> that walks the input character by character tracking one of four states — <em>plain</em>, <em>single-quoted</em>, <em>double-quoted</em>, <em>escaped</em> — and pushes into a current-word buffer. It returns owned <code>String</code>s, not <code>&amp;str</code>, because <code>a"b"c</code> becomes one word assembled from pieces. Every stage below is then one rule inside that machine, and each is directly unit-testable.</p>
+  <ol class="stages">
+    <li class="stage" data-n="13"><input type="checkbox"><span class="num">13</span><div>
+      <h3>Single quotes <code class="slug">ni6</code><span class="diff d-med">Medium</span></h3>
+      <p>Everything between <code>'</code> and the next <code>'</code> is literal, and the quotes themselves are removed. Interior whitespace no longer splits words.</p>
+      <pre class="io"><code>$ echo 'hello   world'
+hello   world</code></pre></div></li>
+    <li class="stage" data-n="14"><input type="checkbox"><span class="num">14</span><div>
+      <h3>Double quotes <code class="slug">tg6</code><span class="diff d-med">Medium</span></h3>
+      <p>Same word-joining as single quotes, but a different escape rule inside — handled in stage 17.</p>
+      <pre class="io"><code>$ echo "quz  hello"  "bar"
+quz  hello bar</code></pre></div></li>
+    <li class="stage" data-n="15"><input type="checkbox"><span class="num">15</span><div>
+      <h3>Backslash outside quotes <code class="slug">yt5</code><span class="diff d-med">Medium</span></h3>
+      <p>A backslash makes the next character literal, including a space, and then disappears.</p>
+      <pre class="io"><code>$ echo world\ \ \ script
+world   script</code></pre></div></li>
+    <li class="stage" data-n="16"><input type="checkbox"><span class="num">16</span><div>
+      <h3>Backslash within single quotes <code class="slug">le5</code><span class="diff d-med">Medium</span></h3>
+      <p>Inside single quotes a backslash is an ordinary character. There are no escapes at all in single quotes — that is the whole rule.</p>
+      <pre class="io"><code>$ echo 'shell\nscript'
+shell\nscript</code></pre></div></li>
+    <li class="stage" data-n="17"><input type="checkbox"><span class="num">17</span><div>
+      <h3>Backslash within double quotes <code class="slug">gu3</code><span class="diff d-med">Medium</span></h3>
+      <p>The awkward one. Inside double quotes a backslash escapes only <code>$</code>, <code>`</code>, <code>"</code>, <code>\</code> and newline. Before anything else it stays a literal backslash <em>and</em> the character follows normally.</p>
+      <pre class="io"><code>$ echo "hello\"insidequotes"
+hello"insidequotes
+$ echo "before\   after"
+before\   after</code></pre></div></li>
+    <li class="stage" data-n="18"><input type="checkbox"><span class="num">18</span><div>
+      <h3>Executing a quoted executable <code class="slug">qj0</code><span class="diff d-med">Medium</span></h3>
+      <p>Runs a program whose filename contains spaces. Nothing new in the lexer — this is the stage that catches you if you re-split the words anywhere downstream of it. Resolve and execute from the token list, never from the raw line.</p>
+      <pre class="io"><code>$ 'exe with space' file.md</code></pre></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g4">
+  <div class="group-head"><span class="range">Stages 19–22</span><h2>Redirection</h2></div>
+  <p class="arch">First stage where a flat token list stops being enough: you need to separate the operator from the words around it. <strong>The decision here:</strong> builtins must obey redirection too, so they can no longer call <code>println!</code>. Give each builtin a <code>&amp;mut dyn Write</code> to write into — the loop passes <code>io::stdout()</code> normally and a <code>File</code> when redirected. That one signature change also makes builtins testable against a <code>Vec&lt;u8&gt;</code>.</p>
+  <ol class="stages">
+    <li class="stage" data-n="19"><input type="checkbox"><span class="num">19</span><div>
+      <h3>Redirect stdout <code class="slug">jv1</code><span class="diff d-med">Medium</span></h3>
+      <p>Both <code>&gt;</code> and the explicit <code>1&gt;</code> truncate-or-create the target file. Use <code>File::create</code>, and for external commands hand the file to <code>Stdio::from(file)</code>.</p>
+      <pre class="io"><code>$ echo hello 1&gt; out.txt</code></pre></div></li>
+    <li class="stage" data-n="20"><input type="checkbox"><span class="num">20</span><div>
+      <h3>Redirect stderr <code class="slug">vz4</code><span class="diff d-med">Medium</span></h3>
+      <p><code>2&gt;</code> sends the error stream instead. The file descriptor number is part of the token, so your parser has to read it rather than matching on <code>&gt;</code> alone.</p></div></li>
+    <li class="stage" data-n="21"><input type="checkbox"><span class="num">21</span><div>
+      <h3>Append stdout <code class="slug">el9</code><span class="diff d-med">Medium</span></h3>
+      <p><code>&gt;&gt;</code> and <code>1&gt;&gt;</code> append instead of truncating: <code>OpenOptions::new().append(true).create(true)</code>.</p></div></li>
+    <li class="stage" data-n="22"><input type="checkbox"><span class="num">22</span><div>
+      <h3>Append stderr <code class="slug">un3</code><span class="diff d-med">Medium</span></h3>
+      <p><code>2&gt;&gt;</code>. If stages 19–21 pushed you into a small <code>Redirect { fd, target, append }</code> struct, this one is already done.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g5">
+  <div class="group-head"><span class="range">Stages 23–28</span><h2>Command completion</h2></div>
+  <p class="arch">A hard pivot: <code>read_line</code> can no longer be your input path, because you need each keystroke as it arrives. That means raw terminal mode — <code>crossterm</code> is the usual choice, and CodeCrafters allows crates. <strong>The decision here:</strong> use a readline library or write your own line editor. Writing it yourself is the point of the challenge and stages 58–63 need the same buffer for history, so build a small <code>LineEditor</code> that owns the buffer, the cursor, and the terminal state.</p>
+  <ol class="stages">
+    <li class="stage" data-n="23"><input type="checkbox"><span class="num">23</span><div>
+      <h3>Builtin completion <code class="slug">qp2</code><span class="diff d-med">Medium</span></h3>
+      <p>TAB on a prefix of a builtin name completes it and appends a space. <code>ech</code> + TAB becomes <code>echo </code>.</p></div></li>
+    <li class="stage" data-n="24"><input type="checkbox"><span class="num">24</span><div>
+      <h3>Completion with arguments <code class="slug">gm9</code><span class="diff d-med">Medium</span></h3>
+      <p>After completing, typing continues normally and the finished line still executes. Confirms your editor's buffer and the terminal's display never drift apart.</p></div></li>
+    <li class="stage" data-n="25"><input type="checkbox"><span class="num">25</span><div>
+      <h3>Missing completions <code class="slug">qm8</code><span class="diff d-easy">Easy</span></h3>
+      <p>No match rings the terminal bell — print <code>\a</code> — and leaves the buffer untouched.</p></div></li>
+    <li class="stage" data-n="26"><input type="checkbox"><span class="num">26</span><div>
+      <h3>Executable completion <code class="slug">gy5</code><span class="diff d-med">Medium</span></h3>
+      <p>Completion source widens from the builtin enum to every executable across <code>$PATH</code>. Scan the directories and collect names; dedupe, because the same name can appear in several entries.</p></div></li>
+    <li class="stage" data-n="27"><input type="checkbox"><span class="num">27</span><div>
+      <h3>Multiple completions <code class="slug">wh6</code><span class="diff d-hard">Hard</span></h3>
+      <p>One TAB with several candidates rings the bell; a second TAB prints them on one line, sorted and space-separated, then redraws the prompt with the buffer intact. You now need to track whether the previous keypress was also a TAB.</p></div></li>
+    <li class="stage" data-n="28"><input type="checkbox"><span class="num">28</span><div>
+      <h3>Partial completions <code class="slug">wt6</code><span class="diff d-hard">Hard</span></h3>
+      <p>When candidates share a longer prefix than what was typed, complete to that longest common prefix and add no trailing space. Write the LCP as its own function — stage 44 needs it again.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g6">
+  <div class="group-head"><span class="range">Stages 29–35</span><h2>Filename completion</h2></div>
+  <p class="arch">The same machinery aimed at the filesystem instead of <code>$PATH</code>. <strong>The decision here:</strong> completion source becomes context-dependent — the first word completes commands, later words complete paths. If stages 23–28 hardcoded "look in PATH", this is where you refactor to a function that takes the word and its position and returns candidates.</p>
+  <ol class="stages">
+    <li class="stage" data-n="29"><input type="checkbox"><span class="num">29</span><div>
+      <h3>File completion <code class="slug">zv2</code><span class="diff d-med">Medium</span></h3>
+      <p>Complete a filename in the current directory from its prefix, via <code>fs::read_dir</code>.</p></div></li>
+    <li class="stage" data-n="30"><input type="checkbox"><span class="num">30</span><div>
+      <h3>Nested file completion <code class="slug">ue6</code><span class="diff d-med">Medium</span></h3>
+      <p><code>src/ma</code> + TAB completes inside <code>src/</code>. Split the word at the last <code>/</code>: everything before is the directory to read, everything after is the prefix to match.</p></div></li>
+    <li class="stage" data-n="31"><input type="checkbox"><span class="num">31</span><div>
+      <h3>Directory completion <code class="slug">lc6</code><span class="diff d-easy">Easy</span></h3>
+      <p>A directory completes with a trailing <code>/</code> and no space, so you can keep descending. Check <code>metadata.is_dir()</code> per candidate.</p></div></li>
+    <li class="stage" data-n="32"><input type="checkbox"><span class="num">32</span><div>
+      <h3>Missing completions <code class="slug">vs5</code><span class="diff d-easy">Easy</span></h3>
+      <p>Bell on no match, same as stage 25 — but also handle the directory simply not existing, which is an <code>Err</code> from <code>read_dir</code> rather than an empty list.</p></div></li>
+    <li class="stage" data-n="33"><input type="checkbox"><span class="num">33</span><div>
+      <h3>Multiple matches <code class="slug">no5</code><span class="diff d-hard">Hard</span></h3>
+      <p>Double-TAB lists matching filenames. List the bare names, not the full paths you read them from.</p></div></li>
+    <li class="stage" data-n="34"><input type="checkbox"><span class="num">34</span><div>
+      <h3>Partial completions <code class="slug">jp8</code><span class="diff d-hard">Hard</span></h3>
+      <p>Longest common prefix again, on filenames. Reuse the function from stage 28 unchanged — if you cannot, it was written against the wrong type.</p></div></li>
+    <li class="stage" data-n="35"><input type="checkbox"><span class="num">35</span><div>
+      <h3>Multi-argument completions <code class="slug">bf8</code><span class="diff d-easy">Easy</span></h3>
+      <p>Completion works on the third, fourth, nth word too — not just the second. Falls out for free if you located the current word by cursor position rather than by index.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g7">
+  <div class="group-head"><span class="range">Stages 36–45</span><h2>Programmable completion</h2></div>
+  <p class="arch">Users register their own completion commands with <code>complete</code>, and your shell shells out to them. <strong>The decision here:</strong> this is the first genuinely stateful builtin — it owns a registry that outlives any one invocation. An <code>enum Builtin</code> match arm cannot hold a <code>HashMap</code>, so either put the registry on your <code>Shell</code> struct and pass <code>&amp;mut Shell</code> into <code>run</code>, or switch to trait objects that own their state. The <code>Shell</code> struct is the smaller change.</p>
+  <ol class="stages">
+    <li class="stage" data-n="36"><input type="checkbox"><span class="num">36</span><div>
+      <h3>Register complete builtin <code class="slug">ne7</code><span class="diff d-easy">Easy</span></h3>
+      <p>Add <code>complete</code> as a builtin that accepts a registration and stores it.</p></div></li>
+    <li class="stage" data-n="37"><input type="checkbox"><span class="num">37</span><div>
+      <h3>Printing missing specifications <code class="slug">oi7</code><span class="diff d-easy">Easy</span></h3>
+      <p><code>complete -p unknown</code> reports that no specification exists for that name.</p></div></li>
+    <li class="stage" data-n="38"><input type="checkbox"><span class="num">38</span><div>
+      <h3>Displaying registered specifications <code class="slug">wl6</code><span class="diff d-med">Medium</span></h3>
+      <p><code>complete -p</code> with no name prints every registration. Sort the output — <code>HashMap</code> iteration order is deliberately unstable in Rust and will fail the test intermittently. Use <code>BTreeMap</code> or sort the keys.</p></div></li>
+    <li class="stage" data-n="39"><input type="checkbox"><span class="num">39</span><div>
+      <h3>Single completion <code class="slug">pm5</code><span class="diff d-med">Medium</span></h3>
+      <p>TAB on a registered command runs its completer program and uses the output — one candidate per line — as the candidate list.</p></div></li>
+    <li class="stage" data-n="40"><input type="checkbox"><span class="num">40</span><div>
+      <h3>Handling no completions <code class="slug">qf1</code><span class="diff d-easy">Easy</span></h3>
+      <p>A completer that prints nothing means no candidates: bell, buffer unchanged.</p></div></li>
+    <li class="stage" data-n="41"><input type="checkbox"><span class="num">41</span><div>
+      <h3>Passing command-line arguments <code class="slug">zi0</code><span class="diff d-easy">Easy</span></h3>
+      <p>The completer receives the command name, the word being completed, and the preceding word as its three positional arguments.</p></div></li>
+    <li class="stage" data-n="42"><input type="checkbox"><span class="num">42</span><div>
+      <h3>Passing environment variables <code class="slug">nr7</code><span class="diff d-easy">Easy</span></h3>
+      <p>Set <code>COMP_LINE</code> (the whole line) and <code>COMP_POINT</code> (cursor offset) in the child's environment via <code>Command::env</code>.</p></div></li>
+    <li class="stage" data-n="43"><input type="checkbox"><span class="num">43</span><div>
+      <h3>Multiple completer candidates <code class="slug">ep2</code><span class="diff d-easy">Easy</span></h3>
+      <p>Several output lines follow the double-TAB listing rules from stage 27.</p></div></li>
+    <li class="stage" data-n="44"><input type="checkbox"><span class="num">44</span><div>
+      <h3>Longest common prefix <code class="slug">xz3</code><span class="diff d-med">Medium</span></h3>
+      <p>LCP applied to completer output. Third use of the same function.</p></div></li>
+    <li class="stage" data-n="45"><input type="checkbox"><span class="num">45</span><div>
+      <h3>Unregister a completion <code class="slug">tz2</code><span class="diff d-easy">Easy</span></h3>
+      <p><code>complete -r name</code> removes one registration and completion falls back to the default behavior.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g8">
+  <div class="group-head"><span class="range">Stages 46–54</span><h2>Background jobs</h2></div>
+  <p class="arch">Your shell stops waiting for its children. <strong>The decision here:</strong> a job table on the <code>Shell</code> struct — job number, PID, command text, status — and a non-blocking reap. <code>Child::try_wait()</code> in std covers this without pulling in <code>nix</code>: it returns <code>Ok(None)</code> for a still-running child instead of blocking. Real job control (<code>Ctrl-Z</code>, <code>fg</code>, process groups) needs raw <code>waitpid</code> and signals, but these stages do not go that far.</p>
+  <ol class="stages">
+    <li class="stage" data-n="46"><input type="checkbox"><span class="num">46</span><div>
+      <h3>The jobs builtin <code class="slug">af3</code><span class="diff d-easy">Easy</span></h3>
+      <p>Add <code>jobs</code>; with nothing running it prints nothing and exits cleanly.</p></div></li>
+    <li class="stage" data-n="47"><input type="checkbox"><span class="num">47</span><div>
+      <h3>Starting background jobs <code class="slug">at7</code><span class="diff d-med">Medium</span></h3>
+      <p>A trailing <code>&amp;</code> spawns without waiting and prints the job number and PID.</p>
+      <pre class="io"><code>$ sleep 5 &amp;
+[1] 12345</code></pre></div></li>
+    <li class="stage" data-n="48"><input type="checkbox"><span class="num">48</span><div>
+      <h3>Printing background job output <code class="slug">si2</code><span class="diff d-med">Medium</span></h3>
+      <p>A background child keeps the terminal's stdout, so its output appears whenever it appears — interleaved with your prompt. Do not capture it.</p></div></li>
+    <li class="stage" data-n="49"><input type="checkbox"><span class="num">49</span><div>
+      <h3>List a single job <code class="slug">jd6</code><span class="diff d-med">Medium</span></h3>
+      <p><code>jobs</code> shows the running job with its number, status, and the command as typed — so store the original text at spawn time.</p>
+      <pre class="io"><code>[1]+  Running                 sleep 5 &amp;</code></pre></div></li>
+    <li class="stage" data-n="50"><input type="checkbox"><span class="num">50</span><div>
+      <h3>List multiple jobs <code class="slug">dk5</code><span class="diff d-med">Medium</span></h3>
+      <p>Several jobs list in order, with <code>+</code> marking the current job and <code>-</code> the previous one. Those two markers are positional, not stored flags.</p></div></li>
+    <li class="stage" data-n="51"><input type="checkbox"><span class="num">51</span><div>
+      <h3>Reap one job <code class="slug">ma9</code><span class="diff d-med">Medium</span></h3>
+      <p>A finished job reports <code>Done</code> and leaves the table.</p></div></li>
+    <li class="stage" data-n="52"><input type="checkbox"><span class="num">52</span><div>
+      <h3>Reap multiple jobs <code class="slug">rq2</code><span class="diff d-med">Medium</span></h3>
+      <p>Several finish together and all are reported. Collect the finished ones before mutating the table — removing while iterating will not borrow-check, which is the borrow checker catching a real bug.</p></div></li>
+    <li class="stage" data-n="53"><input type="checkbox"><span class="num">53</span><div>
+      <h3>Reap before the next prompt <code class="slug">bv8</code><span class="diff d-med">Medium</span></h3>
+      <p>Timing stage: the <code>Done</code> lines must print immediately before the prompt is drawn, not after the next command. One reap call at the top of the loop.</p></div></li>
+    <li class="stage" data-n="54"><input type="checkbox"><span class="num">54</span><div>
+      <h3>Recycle job numbers <code class="slug">fy4</code><span class="diff d-easy">Easy</span></h3>
+      <p>New jobs take the lowest free number, not a monotonic counter. Scan the table for the first gap.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g9">
+  <div class="group-head"><span class="range">Stages 55–57</span><h2>Pipelines</h2></div>
+  <p class="arch">Three stages, all rated hard, and the reason a flat command representation finally breaks. <strong>The decision here:</strong> an AST. <code>enum Node { Command { words, redirects }, Pipeline(Vec&lt;Node&gt;) }</code>, with the parser producing it and execution walking it. Chain externals by handing each child's <code>ChildStdout</code> to the next as <code>Stdio::from</code>. Spawn every stage before waiting on any of them, or a full pipe buffer deadlocks you.</p>
+  <ol class="stages">
+    <li class="stage" data-n="55"><input type="checkbox"><span class="num">55</span><div>
+      <h3>Dual-command pipeline <code class="slug">br6</code><span class="diff d-hard">Hard</span></h3>
+      <p><code>ls | wc -l</code>. Spawn both with <code>Stdio::piped()</code>, wire the first child's stdout into the second's stdin, then wait on the last.</p></div></li>
+    <li class="stage" data-n="56"><input type="checkbox"><span class="num">56</span><div>
+      <h3>Pipelines with built-ins <code class="slug">ny9</code><span class="diff d-hard">Hard</span></h3>
+      <p>A builtin inside a pipeline — <code>echo hi | wc -c</code>. It has no process to pipe from, so it must write into the pipe. This is where the <code>&amp;mut dyn Write</code> signature from stage 19 pays off: hand it the child's stdin instead of a file.</p></div></li>
+    <li class="stage" data-n="57"><input type="checkbox"><span class="num">57</span><div>
+      <h3>Multi-command pipelines <code class="slug">xk3</code><span class="diff d-hard">Hard</span></h3>
+      <p>Arbitrary length. If stage 55 was written as a fold over a vector of stages rather than a special case for two, this passes immediately.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g10">
+  <div class="group-head"><span class="range">Stages 58–63</span><h2>History</h2></div>
+  <p class="arch">Reuses the line editor from stage 23 — arrow keys are escape sequences arriving on the same raw-mode input path. <strong>The decision here:</strong> history is a <code>Vec&lt;String&gt;</code> on the <code>Shell</code> struct plus a browse cursor that is <em>not</em> the same thing as its length. Keep the in-progress line saved separately when the user arrows away from it and back.</p>
+  <ol class="stages">
+    <li class="stage" data-n="58"><input type="checkbox"><span class="num">58</span><div>
+      <h3>The history builtin <code class="slug">bq4</code><span class="diff d-easy">Easy</span></h3>
+      <p>Add <code>history</code>. Decide now whether the <code>history</code> command itself gets recorded — bash records it.</p></div></li>
+    <li class="stage" data-n="59"><input type="checkbox"><span class="num">59</span><div>
+      <h3>Listing history <code class="slug">yf5</code><span class="diff d-med">Medium</span></h3>
+      <p>Numbered from 1, right-aligned in a fixed-width column, command text after. Format with <code>{:&gt;5}</code>.</p>
+      <pre class="io"><code>    1  echo hello
+    2  pwd</code></pre></div></li>
+    <li class="stage" data-n="60"><input type="checkbox"><span class="num">60</span><div>
+      <h3>Limiting history entries <code class="slug">ag6</code><span class="diff d-med">Medium</span></h3>
+      <p><code>history 3</code> shows only the last three — but keeps their original numbers, not 1–3. Slice the tail and offset the index.</p></div></li>
+    <li class="stage" data-n="61"><input type="checkbox"><span class="num">61</span><div>
+      <h3>Up-arrow navigation <code class="slug">rh7</code><span class="diff d-med">Medium</span></h3>
+      <p>Up walks backward through history, replacing the visible line. Redrawing means clearing to end of line — the old text does not erase itself.</p></div></li>
+    <li class="stage" data-n="62"><input type="checkbox"><span class="num">62</span><div>
+      <h3>Down-arrow navigation <code class="slug">vq0</code><span class="diff d-med">Medium</span></h3>
+      <p>Down walks forward, and past the newest entry restores the draft the user was typing. That draft is why the cursor and the vector length are separate pieces of state.</p></div></li>
+    <li class="stage" data-n="63"><input type="checkbox"><span class="num">63</span><div>
+      <h3>Executing commands from history <code class="slug">dm2</code><span class="diff d-med">Medium</span></h3>
+      <p>A recalled line runs normally, and is appended as a new entry rather than moving the old one.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g11">
+  <div class="group-head"><span class="range">Stages 64–69</span><h2>History persistence</h2></div>
+  <p class="arch">History survives restarts. <strong>The decision here:</strong> track how much of the in-memory history has already been written, so <em>append</em> can write only the new tail. That is one <code>usize</code> watermark on the struct, and forgetting it is what makes stage 66 duplicate entries.</p>
+  <ol class="stages">
+    <li class="stage" data-n="64"><input type="checkbox"><span class="num">64</span><div>
+      <h3>Read history from file <code class="slug">za2</code><span class="diff d-med">Medium</span></h3>
+      <p><code>history -r path</code> loads lines from a file onto the end of the current history.</p></div></li>
+    <li class="stage" data-n="65"><input type="checkbox"><span class="num">65</span><div>
+      <h3>Write history to file <code class="slug">in3</code><span class="diff d-med">Medium</span></h3>
+      <p><code>history -w path</code> writes everything, truncating the file first.</p></div></li>
+    <li class="stage" data-n="66"><input type="checkbox"><span class="num">66</span><div>
+      <h3>Append history to file <code class="slug">sx3</code><span class="diff d-hard">Hard</span></h3>
+      <p><code>history -a path</code> appends only entries added since the last write or append. This is the watermark stage.</p></div></li>
+    <li class="stage" data-n="67"><input type="checkbox"><span class="num">67</span><div>
+      <h3>Read history on startup <code class="slug">zp4</code><span class="diff d-easy">Easy</span></h3>
+      <p>If <code>$HISTFILE</code> is set, load it before the first prompt. A missing file is normal, not an error.</p></div></li>
+    <li class="stage" data-n="68"><input type="checkbox"><span class="num">68</span><div>
+      <h3>Write history on exit <code class="slug">kz7</code><span class="diff d-easy">Easy</span></h3>
+      <p>Flush to <code>$HISTFILE</code> when <code>exit</code> runs. Note <code>process::exit</code> skips destructors, so this has to happen explicitly before the call — not in a <code>Drop</code> impl.</p></div></li>
+    <li class="stage" data-n="69"><input type="checkbox"><span class="num">69</span><div>
+      <h3>Append history on exit <code class="slug">jv2</code><span class="diff d-med">Medium</span></h3>
+      <p>Append rather than overwrite on exit, so two shells running at once do not clobber each other.</p></div></li>
+  </ol>
+</section>
+
+<section class="group" id="g12">
+  <div class="group-head"><span class="range">Stages 70–76</span><h2>Parameter expansion</h2></div>
+  <p class="arch">The last group closes the loop back to the lexer. <strong>The decision here:</strong> expansion is a separate pass, run <em>after</em> tokenizing and <em>before</em> execution — because whether <code>$X</code> expands depends on the quoting context the lexer already resolved. If your lexer throws away which quotes a character came from, you will be adding that information back here. Tagging each token with its quote context at stage 13 avoids the rework.</p>
+  <ol class="stages">
+    <li class="stage" data-n="70"><input type="checkbox"><span class="num">70</span><div>
+      <h3>The declare builtin <code class="slug">ji0</code><span class="diff d-easy">Easy</span></h3>
+      <p>Add <code>declare</code>. Another stateful builtin, reading and writing the variable map on your <code>Shell</code>.</p></div></li>
+    <li class="stage" data-n="71"><input type="checkbox"><span class="num">71</span><div>
+      <h3>Printing missing variables <code class="slug">oa2</code><span class="diff d-easy">Easy</span></h3>
+      <p><code>declare -p X</code> for an unset name reports that it was not found and returns non-zero.</p></div></li>
+    <li class="stage" data-n="72"><input type="checkbox"><span class="num">72</span><div>
+      <h3>Storing shell variables <code class="slug">kv5</code><span class="diff d-med">Medium</span></h3>
+      <p><code>declare X=value</code> stores it and <code>declare -p X</code> reads it back. Split on the <em>first</em> <code>=</code> only — values legitimately contain more.</p></div></li>
+    <li class="stage" data-n="73"><input type="checkbox"><span class="num">73</span><div>
+      <h3>Validating variable names <code class="slug">db8</code><span class="diff d-easy">Easy</span></h3>
+      <p>A name must start with a letter or underscore and continue with letters, digits, or underscores. Anything else is an error. Doable with <code>chars()</code>; no regex crate needed.</p></div></li>
+    <li class="stage" data-n="74"><input type="checkbox"><span class="num">74</span><div>
+      <h3>Expanding variables <code class="slug">ge9</code><span class="diff d-hard">Hard</span></h3>
+      <p><code>$X</code> expands in plain and double-quoted words, never in single-quoted ones. The name ends at the first character that cannot be part of a name — <code>$X/bar</code> expands <code>X</code>, not <code>X/bar</code>.</p>
+      <pre class="io"><code>$ declare X=world
+$ echo "hello $X"
+hello world
+$ echo 'hello $X'
+hello $X</code></pre></div></li>
+    <li class="stage" data-n="75"><input type="checkbox"><span class="num">75</span><div>
+      <h3>Expansion with braces <code class="slug">br2</code><span class="diff d-med">Medium</span></h3>
+      <p><code>${X}</code> delimits the name explicitly, so <code>${X}abc</code> works where <code>$Xabc</code> would look up the wrong name.</p></div></li>
+    <li class="stage" data-n="76"><input type="checkbox"><span class="num">76</span><div>
+      <h3>Expanding empty variables <code class="slug">my0</code><span class="diff d-easy">Easy</span></h3>
+      <p>An unset variable expands to the empty string silently — no error, no literal <code>$X</code> left behind. <code>map.get(name).cloned().unwrap_or_default()</code> is the whole stage.</p></div></li>
+  </ol>
+</section>
+
+<footer>
+  <p><strong>Provenance.</strong> Stage names, slugs, difficulty ratings, and grouping were read from the public course overview at <code>app.codecrafters.io/courses/shell/overview</code> on 30 August 2026. The per-stage descriptions, examples, and Rust notes are mine — the official stage instructions require a login, so treat this page as a map, not as the spec. The harness is the authority on exact output.</p>
+  <p><strong>Offline.</strong> This file is self-contained. It links IBM Plex from Google Fonts when a network is available and falls back to your system serif, sans, and monospace faces when it is not — the layout is unaffected either way.</p>
+</footer>
+</div>
+
+<script>
+(function () {
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('li.stage input[type=checkbox]'));
+  var KEY = 'ccshell-stages-v1';
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    var seeded = {};
+    for (var i = 1; i <= 12; i++) seeded[i] = true;
+    return seeded;
+  }
+
+  function save(state) {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  var state = load() || {};
+
+  function paint() {
+    var done = 0;
+    boxes.forEach(function (box) {
+      var li = box.closest('li.stage');
+      var n = li.getAttribute('data-n');
+      box.checked = !!state[n];
+      li.classList.toggle('done', box.checked);
+      box.setAttribute('aria-label', 'Stage ' + n + ' complete');
+      if (box.checked) done++;
+    });
+    document.getElementById('done').textContent = done;
+    document.getElementById('bar').style.width = (done / boxes.length * 100) + '%';
+  }
+
+  boxes.forEach(function (box) {
+    box.addEventListener('change', function () {
+      var n = box.closest('li.stage').getAttribute('data-n');
+      if (box.checked) { state[n] = true; } else { delete state[n]; }
+      save(state);
+      paint();
+    });
+  });
+
+  paint();
+})();
+</script>
