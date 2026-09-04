@@ -29,7 +29,7 @@ impl Builtin {
         }
     }
 
-    pub fn run(&self, args: &[&str]) -> Loop {
+    pub fn run(&self, args: &[String]) -> Loop {
         match self {
             Self::Echo => {
                 println!("{}", args.join(" "));
@@ -66,7 +66,7 @@ impl Builtin {
                     env::set_current_dir(env::home_dir().unwrap()).unwrap();
                     return Loop::Continue;
                 }
-                let path: &Path = Path::new(args[0]);
+                let path: &Path = Path::new(&args[0]);
                 let exists = path.exists();
                 if !exists {
                     println!("cd: {}: No such file or directory", path.to_string_lossy());
