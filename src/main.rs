@@ -11,7 +11,9 @@ fn main() {
         print!("$ ");
         let mut input: String = String::new();
         io::stdout().flush().unwrap();
-        io::stdin().read_line(&mut input).unwrap();
+        if io::stdin().read_line(&mut input).unwrap() == 0 {
+            break;
+        }
         // Capturing input ends
 
         // Lexing begins

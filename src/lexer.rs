@@ -5,6 +5,8 @@ enum State {
     Double,
 }
 
+const DOUBLE_ESCAPED: [char; 4] = ['$','`','"','\\'];
+
 pub fn lex(input: &str) -> Vec<String> {
     let mut output: Vec<String> = Vec::new();
     let mut word: Option<String> = None;
@@ -25,6 +27,11 @@ pub fn lex(input: &str) -> Vec<String> {
                 word.get_or_insert_with(String::new);
                 state = State::Double;
             }
+            (State::Plain, '\\') => {
+                if let Some(x) = input_chars.next() {
+                    word.get_or_insert_with(String::new).push(x);
+                }
+            }
             (State::Plain, c) if c.is_whitespace() => {
                 if let Some(finished) = word.take() {
                     output.push(finished);
@@ -37,6 +44,17 @@ pub fn lex(input: &str) -> Vec<String> {
 
             (State::Double, '"') => {
                 state = State::Plain;
+            }
+            (State::Double, '\\') => {
+                if let Some(x) = input_chars.next() {
+                    if DOUBLE_ESCAPED.contains(&x) {
+                        word.get_or_insert_with(String::new).push(x);
+                    }
+                    else {
+                        word.get_or_insert_with(String::new).push('\\');
+                        word.get_or_insert_with(String::new).push(x);
+                    }
+                }
             }
 
             (_, c) => word.get_or_insert_with(String::new).push(c),
@@ -111,5 +129,28 @@ mod tests {
     #[test]
     fn tabs_separate_words() {
         assert_eq!(lex("echo\thi"), ["echo", "hi"]);
+    }
+
+    #[test]
+    fn single_quoted_command_stays_one_word() {
+        assert_eq!(lex("'exe with space' file.md"), ["exe with space", "file.md"]);
+    }
+
+    #[test]
+    fn double_quoted_command_stays_one_word() {
+        assert_eq!(lex("\"exe with space\" file.md"), ["exe with space", "file.md"]);
+    }
+
+    #[test]
+    fn escaped_spaces_in_command_stay_one_word() {
+        assert_eq!(lex(r"exe\ with\ space file.md"), ["exe with space", "file.md"]);
+    }
+
+    #[test]
+    fn quotes_inside_a_quoted_command_name() {
+        assert_eq!(
+            lex(r#"'exe with "quotes"' file.md"#),
+            [r#"exe with "quotes""#, "file.md"]
+        );
     }
 }
