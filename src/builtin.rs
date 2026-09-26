@@ -1,6 +1,9 @@
+use bytes::buf::Writer;
+
 use crate::path;
 
 use std::env;
+use std::io::{Stdout, Write};
 use std::path::Path;
 
 pub enum Loop {
@@ -29,10 +32,11 @@ impl Builtin {
         }
     }
 
-    pub fn run(&self, args: &[String]) -> Loop {
+    pub fn run(&self, args: &[String], mut out: Box<dyn Write>) -> Loop {
         match self {
             Self::Echo => {
-                println!("{}", args.join(" "));
+                let output: String = format!("{}\n", args.join(" "));
+                out.write(output.as_bytes()).unwrap();
                 return Loop::Continue;
             }
             Self::Type => {
@@ -49,7 +53,8 @@ impl Builtin {
                 } else {
                     output.push_str(": not found");
                 }
-                println!("{}", output);
+                output = format!("{}\n", output);
+                let _ = out.write(output.as_bytes());
                 return Loop::Continue;
             }
             Self::Pwd => {
